@@ -1,6 +1,6 @@
 2. Carbon Credit Forgery-Proof Sentinel (AI/Web3 Auditing) give a title for this project
 
-The combination of Geospatial AI for environmental verification and Blockchain for immutable auditing is powerful. Here are the best titles for Project 2, designed to immediately communicate the unique value proposition:
+The combination of  AI for environmental verification and Blockchain for immutable auditing is powerful. Here are the best titles for Project 2, designed to immediately communicate the unique value proposition:
 
 🌳 Project Titles: Carbon Credit Forgery-Proof Sentinel
 Category	Title Option	Key Communication to Judges
