@@ -31,3 +31,43 @@ We solved these problems by replacing human auditors with **deterministic code**
 ### 3. Computational Efficiency
 *   **The Innovation**: Existing solutions use heavy blockchains (Ethereum) and heavy AI models.
 *   **Our Approach**: We engineered a custom, lightweight "Proof of Authority" ledger that runs on standard CPU hardware, paired with optimized numerical analysis (NumPy-based) for image processing. This makes the system virtually free to run while maintaining 100% trust.
+
+## 🚀 How to Run the Software
+
+### Prerequisites
+*   **Python 3.8+** must be installed on your system.
+
+### Step-by-Step Installation
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/jairajcj/GeoVerify.git
+    cd GeoVerify
+    ```
+
+2.  **Install Dependencies**
+    We use a unified requirements file to manage all dependencies (Flask, NumPy, etc.).
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### Running the Application
+
+**Option A: One-Click Start (Windows)**
+*   Double-click the `run_project.bat` file in the root directory.
+
+**Option B: Manual Start (Terminal)**
+*   Run the following command in your terminal:
+    ```bash
+    python app.py
+    ```
+
+### Accessing the Dashboard
+Once the server is running, open your web browser and navigate to:
+👉 **http://127.0.0.1:5000**
+
+1.  **Enter Coordinates**: Input a Latitude/Longitude (or use the defaults).
+2.  **Click "Initiate Scan"**: The AI Sentinel will analyze the location.
+3.  **View Results**: Watch the "Green Cover" metrics update in real-time.
+4.  **Check the Ledger**: See the new block appear in the "Immutable Ledger Stream" below.
+
