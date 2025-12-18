@@ -11,27 +11,27 @@ GeoVerify is a high-efficiency system designed to solve the problem of carbon cr
     - **AI Engine**: Efficient image processing to calculate green cover.
     - **Ledger Core**: A lightweight cryptographic ledger to store verification hashes.
 
-## 👨‍⚖️ For Judges: Demo Capabilities
+##  For Judges: Demo Capabilities
 To demonstrate the system's "Verified" vs "Flagged" logic, use these specific coordinates:
 
-### ✅ For a "Verified" Result (The Golden Ticket)
+###   For a "Verified" Result (The Golden Ticket)
 These coordinates simulate a protected, high-density forest region.
 *   **Latitude**: `11.4102`
 *   **Longitude**: `76.6950`
 *   **Expected Result**: `VERIFIED` with "High Density Forest Detected".
 
-### ❌ For a "Flagged" Result
+###  For a "Flagged" Result
 Any other random coordinate will likely be flagged if the green cover is insufficient in the simulation.
 *   **Example**: `0.0000`, `0.0000`
 *   **Expected Result**: `FLAGGED` with "Insufficient Green Cover".
 
-## 🚩 The Problem: "The Phantom Forest" Crisis
+##  The Problem: "The Phantom Forest" Crisis
 The global Carbon Credit market suffers from three critical failures:
 1.  **Greenwashing & Forgery**: Credits are often sold for forests that have been cut down or never existed (Phantom Forests).
 2.  **Double Spending**: Without a central source of truth, the same environmental asset acts as collateral for multiple different buyers.
 3.  **Audit Inefficiency**: Traditional verification relies on manual human inspection, which is slow, expensive, and prone to corruption.
 
-## 💡 The Solution: GeoVerify Protocol
+##  The Solution: GeoVerify Protocol
 We solved these problems by replacing human auditors with **deterministic code**:
 
 ### 1. Trusted Verification (The "AI Sentinel")
@@ -46,7 +46,7 @@ We solved these problems by replacing human auditors with **deterministic code**
 *   **The Innovation**: Existing solutions use heavy blockchains (Ethereum) and heavy AI models.
 *   **Our Approach**: We engineered a custom, lightweight "Proof of Authority" ledger that runs on standard CPU hardware, paired with optimized numerical analysis (NumPy-based) for image processing. This makes the system virtually free to run while maintaining 100% trust.
 
-## 🚀 How to Run the Software
+##  How to Run the Software
 
 ### Prerequisites
 *   **Python 3.8+** must be installed on your system.
@@ -78,7 +78,7 @@ We solved these problems by replacing human auditors with **deterministic code**
 works 
 ### Accessing the Dashboard
 Once the server is running, open your web browser and navigate to:
-👉 **http://127.0.0.1:5000**
+ **http://127.0.0.1:5000**
 
 1.  **Enter Coordinates**: Input a Latitude/Longitude (or use the defaults).
 2.  **Click "Initiate Scan"**: The AI Sentinel will analyze the location.
