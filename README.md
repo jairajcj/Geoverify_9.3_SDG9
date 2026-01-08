@@ -1,6 +1,7 @@
 dine# GeoVerify: AI-Blockchain Sentinel for Green Asset Auditing
 dine# GeoVerify: AI-Blockchain Sentinel for Green Asset Auditing
 dine# GeoVerify: AI-Blockchain Sentinel for Green Asset Auditing
+dine# GeoVerify: AI-Blockchain Sentinel for Green Asset Auditing
 
 ## Project Overview
 GeoVerify is a high-efficiency system designed to solve the problem of carbon credit forgery using a dual-layer technology stack:
