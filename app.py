@@ -36,6 +36,20 @@ def verify_asset():
         "block_hash": blockchain.hash(new_block)
     })
 
+@app.route('/api/estimate', methods=['POST'])
+def estimate_credits():
+    data = request.json
+    lat = float(data.get('lat', 0))
+    lon = float(data.get('lon', 0))
+    
+    # AI Verification (Estimation only)
+    estimation = sentinel.verify_location(lat, lon)
+    
+    return jsonify({
+        "estimation": estimation
+    })
+
+
 @app.route('/api/chain', methods=['GET'])
 def get_chain():
     response = {
@@ -43,6 +57,41 @@ def get_chain():
         'length': len(blockchain.chain)
     }
     return jsonify(response)
+
+@app.route('/api/audit-log', methods=['GET'])
+def get_audit_log():
+    """Returns a detailed audit log of all blockchain transactions"""
+    audit_entries = []
+    
+    for block in blockchain.chain:
+        for data_entry in block.get('data', []):
+            audit_entries.append({
+                'timestamp': block['timestamp'],
+                'block_index': block['index'],
+                'block_hash': blockchain.hash(block)[:16] + '...',
+                'location': f"({data_entry.get('latitude', 'N/A')}, {data_entry.get('longitude', 'N/A')})",
+                'status': data_entry.get('status', 'UNKNOWN'),
+                'carbon_credits': data_entry.get('carbon_credits', 0),
+                'green_cover': data_entry.get('green_cover_percentage', 0)
+            })
+    
+    return jsonify({
+        'total_entries': len(audit_entries),
+        'entries': audit_entries
+    })
+
+@app.route('/api/sentinel-log', methods=['GET'])
+def get_sentinel_log():
+    """Returns sentinel verification activity logs"""
+    # Get verification history from sentinel
+    sentinel_logs = sentinel.get_verification_history()
+    
+    return jsonify({
+        'total_verifications': len(sentinel_logs),
+        'logs': sentinel_logs,
+        'sentinel_status': 'ACTIVE',
+        'ai_model_version': '2.1.0'
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

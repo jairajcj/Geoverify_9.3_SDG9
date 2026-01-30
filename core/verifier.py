@@ -7,7 +7,9 @@ class GeoSentinel:
     to verify carbon assets.
     """
     def __init__(self):
-        pass
+        self.green_threshold = 45.0
+        self.confidence_threshold = 0.80
+        self.verification_history = []  # Track all verifications
 
     def verify_location(self, lat, lon):
         """
@@ -36,14 +38,15 @@ class GeoSentinel:
         is_valid = True
         
         # Criterion A: Green Cover
-        if green_cover < 45.0:
+        if green_cover < self.green_threshold:
             is_valid = False
-            reasons.append(f"Insufficient Green Cover ({round(green_cover,1)}% < 45%)")
+            reasons.append(f"Insufficient Green Cover ({round(green_cover,1)}% < {self.green_threshold}%)")
         
         # Criterion B: AI Confidence/Authenticity
-        if authenticity_score < 0.80:
+        if authenticity_score < self.confidence_threshold:
             is_valid = False
-            reasons.append("AI Confidence Low - Potential Forgery")
+            reasons.append(f"AI Confidence Low - Potential Forgery ({round(authenticity_score*100,1)}% < {round(self.confidence_threshold*100,1)}%)")
+
 
         if is_valid:
             status = "VERIFIED"
@@ -51,12 +54,32 @@ class GeoSentinel:
         else:
             status = "FLAGGED"
 
-        return {
+        # 4. Carbon Credit Calculation
+        # Simple formula for demo: (Green Cover % / 100) * 25 credits maximum * Confidence
+        if is_valid:
+            carbon_credits = (green_cover / 100) * 25.0 * authenticity_score
+        else:
+            carbon_credits = 0.0
+
+
+        result = {
             "latitude": lat,
             "longitude": lon,
             "green_cover_percentage": round(green_cover, 2),
             "ai_confidence": round(authenticity_score * 100, 1),
             "status": status,
+            "carbon_credits": round(carbon_credits, 2),
             "reasons": reasons,
             "timestamp": time.time()
         }
+        
+        # Store in history
+        self.verification_history.append(result)
+        
+        return result
+
+    
+    def get_verification_history(self):
+        """Returns the history of all verifications performed by this sentinel"""
+        return self.verification_history
+

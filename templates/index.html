@@ -58,9 +58,13 @@
                             <input type="text" id="latInput" placeholder="Latitude (e.g., -3.4653)" value="-3.4653">
                             <input type="text" id="lonInput" placeholder="Longitude (e.g., 62.2159)" value="62.2159">
                             <button id="verifyBtn" class="btn-primary">
-                                <span class="btn-text">Initiate Scan</span>
+                                <span class="btn-text">Verify & Mine</span>
                                 <div class="loader hidden"></div>
                             </button>
+                            <button id="estimateBtn" class="btn-secondary">
+                                <span class="btn-text">Estimate Credits</span>
+                            </button>
+
                         </div>
                         <div class="visualizer" id="visualizer">
                             <div class="scanning-overlay hidden"></div>
@@ -87,6 +91,10 @@
                             <span class="label">AI Confidence</span>
                             <span class="value" id="confidenceValue">--%</span>
                         </div>
+                        <div class="metric highlight">
+                            <span class="label">Carbon Credits</span>
+                            <span class="value" id="creditsValue">-- tCO2e</span>
+                        </div>
                         <div class="metric full-width"
                             style="grid-column: 1 / -1; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem;">
                             <span class="label">Sentinel Report</span>
@@ -110,6 +118,38 @@
             </section>
         </main>
     </div>
+
+    <!-- Audit Log Modal -->
+    <div id="auditLogModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔍 Blockchain Audit Log</h2>
+                <button class="close-modal" data-modal="auditLogModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="auditLogContent" class="log-container">
+                    <div class="loading-spinner">Loading audit data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sentinel Log Modal -->
+    <div id="sentinelLogModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛰️ Sentinel Activity Log</h2>
+                <button class="close-modal" data-modal="sentinelLogModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="sentinel-stats" id="sentinelStats"></div>
+                <div id="sentinelLogContent" class="log-container">
+                    <div class="loading-spinner">Loading sentinel data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/main.js"></script>
 </body>
 
