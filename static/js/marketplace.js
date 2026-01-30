@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             
             <div class="listing-actions">
-                <button class="btn-buy" onclick="quickBuy('${listing.listing_id}', ${listing.available_amount}, ${listing.price_per_credit})">
+                <button class="btn-buy" onclick="sendInquiry('${listing.listing_id}', '${listing.seller_name}')">
                     Send Inquiry
                 </button>
                 <button class="btn-details" onclick="viewListingDetails('${listing.listing_id}')">
@@ -264,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="trader-info">
                         <h3>${company.name}</h3>
                         <p>${company.industry} | ${company.country}</p>
+                        <p style="font-size: 0.75rem; color: var(--accent); margin-top: 0.2rem;">${company.email}</p>
                     </div>
                     <div class="trader-stats">
                         <div class="t-stat">
@@ -311,7 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = {
             company_name: document.getElementById('companyName').value,
             industry: document.getElementById('industry').value,
-            country: document.getElementById('country').value
+            country: document.getElementById('country').value,
+            email: document.getElementById('companyEmail').value
         };
 
         try {
@@ -444,6 +446,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Global functions for inline onclick handlers
+    window.sendInquiry = function (listingId, sellerName) {
+        const buyerCompanyId = prompt(`Enter your Company ID to send inquiry to ${sellerName}:`);
+        if (!buyerCompanyId) return;
+
+        fetch('/api/marketplace/inquiry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                listing_id: listingId,
+                buyer_id: buyerCompanyId
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ Inquiry successfully sent to ${sellerName} (${data.seller_email})!\n\nThey have been notified that you are interested in their product.`);
+                    loadMarketplaceListings();
+                } else {
+                    alert(`❌ Error: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                alert(`❌ Error: ${error.message}`);
+            });
+    };
+
     window.quickBuy = function (listingId, amount, price) {
         const buyerCompanyId = prompt('Enter your Company ID to purchase:');
         if (!buyerCompanyId) return;

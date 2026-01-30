@@ -19,7 +19,7 @@ class CarbonMarketplace:
         self.order_id_counter = 2000
         self.transaction_id_counter = 3000
         
-    def register_company(self, company_name, industry, country, wallet_address):
+    def register_company(self, company_name, industry, country, wallet_address, email=None):
         """Register a manufacturing company on the platform"""
         company_id = hashlib.sha256(f"{company_name}{time.time()}".encode()).hexdigest()[:12]
         
@@ -28,6 +28,7 @@ class CarbonMarketplace:
             'name': company_name,
             'industry': industry,
             'country': country,
+            'email': email or f"contact@{company_name.lower().replace(' ', '')}.com",
             'wallet_address': wallet_address,
             'verified': True,
             'credits_owned': 0,
@@ -38,6 +39,31 @@ class CarbonMarketplace:
         }
         
         return company_id
+
+    def send_inquiry(self, listing_id, buyer_id):
+        """Simulate sending an inquiry email to the seller"""
+        listing = next((l for l in self.listings if l['listing_id'] == listing_id), None)
+        if not listing:
+            return {"success": False, "error": "Listing not found"}
+            
+        seller = self.companies.get(listing['seller_id'])
+        buyer = self.companies.get(buyer_id)
+        
+        if not seller or not buyer:
+            return {"success": False, "error": "Seller or Buyer not found"}
+            
+        listing['interested_buyers'] += 1
+        
+        # Simulate email notification
+        print(f"NOTIFICATION: Sending email to {seller['email']}")
+        print(f"Subject: New Inquiry for your Carbon Credit Listing {listing_id}")
+        print(f"Message: Hello {seller['name']}, a buyer ({buyer['name']}) is interested in your listing in {listing['location']}.")
+        
+        return {
+            "success": True, 
+            "message": f"Inquiry sent to {seller['name']}",
+            "seller_email": seller['email']
+        }
     
     def create_listing(self, seller_id, credit_amount, price_per_credit, 
                        verification_data, location, description=""):

@@ -105,6 +105,7 @@ def register_company():
         company_name=data.get('company_name'),
         industry=data.get('industry'),
         country=data.get('country'),
+        email=data.get('email'),
         wallet_address=data.get('wallet_address', 'DEMO_WALLET')
     )
     
@@ -113,6 +114,16 @@ def register_company():
         'company_id': company_id,
         'message': 'Company registered successfully'
     })
+
+@app.route('/api/marketplace/inquiry', methods=['POST'])
+def send_inquiry():
+    """Send an inquiry for a listing"""
+    data = request.json
+    listing_id = data.get('listing_id')
+    buyer_id = data.get('buyer_id')
+    
+    result = marketplace.send_inquiry(listing_id, buyer_id)
+    return jsonify(result)
 
 @app.route('/api/marketplace/create-listing', methods=['POST'])
 def create_listing():
@@ -220,21 +231,24 @@ def init_demo_data():
         "GreenTech Industries",
         "Manufacturing",
         "India",
-        "0x1234...5678"
+        "0x1234...5678",
+        "contact@greentech.io"
     )
     
     company2 = marketplace.register_company(
         "EcoForest Solutions",
         "Forestry",
         "Brazil",
-        "0xabcd...efgh"
+        "0xabcd...efgh",
+        "info@ecoforest.br"
     )
     
     company3 = marketplace.register_company(
         "CleanEnergy Corp",
         "Energy",
         "Germany",
-        "0x9876...5432"
+        "0x9876...5432",
+        "support@cleanenergy.de"
     )
     
     # Create demo listings
