@@ -197,6 +197,16 @@ def get_company_profile(company_id):
         'profile': profile
     })
 
+@app.route('/api/marketplace/companies', methods=['GET'])
+def get_all_companies():
+    """Get all registered companies"""
+    companies_list = list(marketplace.companies.values())
+    return jsonify({
+        'success': True,
+        'total_companies': len(companies_list),
+        'companies': companies_list
+    })
+
 @app.route('/marketplace')
 def marketplace_page():
     """Render the marketplace page"""

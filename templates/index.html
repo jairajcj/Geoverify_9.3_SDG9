@@ -155,7 +155,7 @@
                             <span class="stat-value" id="avgPrice">$0.00</span>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="activeTradersCard" style="cursor: pointer;">
                         <div class="stat-icon">🏢</div>
                         <div class="stat-content">
                             <span class="stat-label">Active Traders</span>
@@ -227,6 +227,21 @@
                 <div class="sentinel-stats" id="sentinelStats"></div>
                 <div id="sentinelLogContent" class="log-container">
                     <div class="loading-spinner">Loading sentinel data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Traders Modal -->
+    <div id="tradersModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏢 Active Network Enterprises</h2>
+                <button class="close-modal" data-modal="tradersModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="tradersList" class="traders-grid">
+                    <div class="loading-spinner">Fetching active enterprises...</div>
                 </div>
             </div>
         </div>

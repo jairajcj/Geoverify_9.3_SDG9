@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshListingsBtn = document.getElementById('refreshListingsBtn');
     const refreshTransactionsBtn = document.getElementById('refreshTransactionsBtn');
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    const tradersModal = document.getElementById('tradersModal');
+    const activeTradersCard = document.getElementById('activeTradersCard');
 
     // Close buttons
     const closeButtons = document.querySelectorAll('.close-modal');
@@ -19,6 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
     registerBtn.addEventListener('click', () => openModal(registerModal));
     sellBtn.addEventListener('click', () => openModal(sellModal));
     buyBtn.addEventListener('click', () => openModal(buyModal));
+    if (activeTradersCard) {
+        activeTradersCard.addEventListener('click', () => {
+            openModal(tradersModal);
+            loadActiveTraders();
+        });
+    }
 
     // Close modals
     closeButtons.forEach(btn => {
@@ -51,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadMarketStats();
         loadMarketplaceListings();
         loadTransactions();
+        loadActiveTraders(); // Keep traders list warm
     };
 
     // Initial load
@@ -138,40 +147,38 @@ document.addEventListener('DOMContentLoaded', () => {
         card.innerHTML = `
             <div class="listing-header">
                 <div class="listing-seller">${listing.seller_name}</div>
-                <div class="listing-badge">ACTIVE</div>
+                <div class="listing-badge">VERIFIED SELLER</div>
             </div>
             
             <div class="listing-details">
                 <div class="listing-detail-row">
-                    <span class="listing-detail-label">Available Credits</span>
+                    <span class="listing-detail-label">Asset:</span>
+                    <span class="listing-detail-value">Verified Carbon Credit</span>
+                </div>
+                <div class="listing-detail-row">
+                    <span class="listing-detail-label">Quantity:</span>
                     <span class="listing-detail-value">${listing.available_amount} tCO2e</span>
                 </div>
                 <div class="listing-detail-row">
-                    <span class="listing-detail-label">Price per Credit</span>
+                    <span class="listing-detail-label">Price:</span>
                     <span class="listing-detail-value listing-price">$${listing.price_per_credit.toFixed(2)}</span>
                 </div>
                 <div class="listing-detail-row">
-                    <span class="listing-detail-label">Total Value</span>
-                    <span class="listing-detail-value">$${listing.total_value.toLocaleString()}</span>
-                </div>
-                <div class="listing-detail-row">
-                    <span class="listing-detail-label">Location</span>
+                    <span class="listing-detail-label">Location:</span>
                     <span class="listing-detail-value">${listing.location}</span>
                 </div>
-                <div class="listing-detail-row">
-                    <span class="listing-detail-label">Listed On</span>
-                    <span class="listing-detail-value">${createdDate}</span>
-                </div>
+                ${listing.description ? `
+                <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">${listing.description}</p>
+                </div>` : ''}
             </div>
-            
-            ${listing.description ? `<div class="listing-description">${listing.description}</div>` : ''}
             
             <div class="listing-actions">
                 <button class="btn-buy" onclick="quickBuy('${listing.listing_id}', ${listing.available_amount}, ${listing.price_per_credit})">
-                    Buy Now
+                    Send Inquiry
                 </button>
                 <button class="btn-details" onclick="viewListingDetails('${listing.listing_id}')">
-                    Details
+                    Full Details
                 </button>
             </div>
         `;
@@ -233,6 +240,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return item;
     }
+
+    async function loadActiveTraders() {
+        const tradersList = document.getElementById('tradersList');
+        if (!tradersList) return;
+
+        try {
+            const response = await fetch('/api/marketplace/companies');
+            const data = await response.json();
+
+            if (!data.success || data.companies.length === 0) {
+                tradersList.innerHTML = '<div class="empty-state">No active enterprises found.</div>';
+                return;
+            }
+
+            tradersList.innerHTML = '';
+            data.companies.forEach(company => {
+                const card = document.createElement('div');
+                card.className = 'trader-card';
+                card.innerHTML = `
+                    <div class="trader-badge">VERIFIED</div>
+                    <div class="trader-logo">🏢</div>
+                    <div class="trader-info">
+                        <h3>${company.name}</h3>
+                        <p>${company.industry} | ${company.country}</p>
+                    </div>
+                    <div class="trader-stats">
+                        <div class="t-stat">
+                            <span class="t-label">Credits Owned</span>
+                            <span class="t-value">${company.credits_owned.toFixed(2)}</span>
+                        </div>
+                        <div class="t-stat">
+                            <span class="t-label">Total Trades</span>
+                            <span class="t-value">${company.total_trades}</span>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" style="margin-top: 1rem; width: 100%; font-size: 0.8rem;" onclick="viewCompanyProfile('${company.company_id}')">
+                        View Profile
+                    </button>
+                `;
+                tradersList.appendChild(card);
+            });
+        } catch (error) {
+            console.error('Error loading traders:', error);
+            tradersList.innerHTML = '<div class="error-state">Failed to load trader data</div>';
+        }
+    }
+
+    window.viewCompanyProfile = function (companyId) {
+        alert("Detailed Company Profiles coming soon! ID: " + companyId);
+    };
 
     function applyFilters() {
         const maxPrice = document.getElementById('maxPriceFilter').value;
