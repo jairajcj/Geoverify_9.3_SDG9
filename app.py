@@ -1,4 +1,12 @@
 from flask import Flask, render_template, jsonify, request
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from core.blockchain import Blockchain
 from core.verifier import GeoSentinel
 from core.marketplace import CarbonMarketplace
@@ -9,6 +17,33 @@ app = Flask(__name__)
 blockchain = Blockchain()
 sentinel = GeoSentinel()
 marketplace = CarbonMarketplace(blockchain)
+
+# Email Configuration (Use environment variables for security)
+# To use Gmail: Create an App Password at https://myaccount.google.com/apppasswords
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "your-email@gmail.com")
+SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "your-app-password")
+
+def send_real_email(receiver_email, subject, body):
+    """Sends an actual email using smtplib"""
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = receiver_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        text = msg.as_string()
+        server.sendmail(SENDER_EMAIL, receiver_email, text)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"FAILED TO SEND EMAIL: {e}")
+        return False
 
 @app.route('/')
 def index():
@@ -122,7 +157,31 @@ def send_inquiry():
     listing_id = data.get('listing_id')
     buyer_id = data.get('buyer_id')
     
+    # 1. Get info from logic layer
     result = marketplace.send_inquiry(listing_id, buyer_id)
+    
+    if result.get('success'):
+        # 2. Try to send real email
+        seller_email = result.get('seller_email')
+        subject = f"GeoVerify: New Inquiry for Listing {listing_id}"
+        body = f"""
+Hello,
+
+You have a new inquiry for your carbon credit listing on GeoVerify.
+
+Listing ID: {listing_id}
+Buyer ID: {buyer_id}
+
+Please login to your dashboard to respond to this inquiry.
+
+Best regards,
+GeoVerify Sentinel System
+        """
+        email_sent = send_real_email(seller_email, subject, body)
+        result['real_email_sent'] = email_sent
+        if not email_sent:
+            result['warning'] = "Real email failed to send. Check SMTP credentials in app.py or environment variables."
+            
     return jsonify(result)
 
 @app.route('/api/marketplace/create-listing', methods=['POST'])
