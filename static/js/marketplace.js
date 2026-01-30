@@ -461,7 +461,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert(`✅ Inquiry successfully sent to ${sellerName} (${data.seller_email})!\n\nThey have been notified that you are interested in their product.`);
+                    let msg = `✅ Inquiry recorded for ${sellerName}!`;
+                    if (data.real_email_sent) {
+                        msg += `\n\nAn actual email has been sent to ${data.seller_email}.`;
+                    } else {
+                        msg += `\n\n⚠️ Note: The email notification could not be sent. Please ensure the server has correct SMTP credentials in the .env file.`;
+                    }
+                    alert(msg);
                     loadMarketplaceListings();
                 } else {
                     alert(`❌ Error: ${data.error}`);
