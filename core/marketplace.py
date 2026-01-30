@@ -18,6 +18,66 @@ class CarbonMarketplace:
         self.listing_id_counter = 1000
         self.order_id_counter = 2000
         self.transaction_id_counter = 3000
+        self.market_price_history = self._generate_simulated_history()
+        self.current_market_price = self.market_price_history[-1]['price']
+        
+    def _generate_simulated_history(self):
+        """Generates realistic market price data for the last 14 days"""
+        history = []
+        base_price = 24.50
+        for i in range(14):
+            base_price += random.uniform(-1.5, 2.0)
+            history.append({
+                'day': i,
+                'price': round(base_price, 2),
+                'volume': random.randint(5000, 15000),
+                'timestamp': time.time() - (14 - i) * 86400
+            })
+        return history
+
+    def get_market_intelligence(self):
+        """Returns live market prices and trends"""
+        # In a real app, this would call an API like MSCI or Carbon Pricing Dashboard
+        change = ((self.current_market_price - self.market_price_history[0]['price']) / 
+                  self.market_price_history[0]['price']) * 100
+        
+        return {
+            'live_price': self.current_market_price,
+            'fair_value_range': [round(self.current_market_price * 0.9, 2), 
+                               round(self.current_market_price * 1.1, 2)],
+            'price_change_14d': round(change, 2),
+            'market_history': self.market_price_history,
+            'index_name': 'Global Composite Carbon Index (GCCI)',
+            'updated_at': time.time()
+        }
+
+    def predict_carbon_footprint(self, production_data):
+        """
+        AI tool to estimate carbon footprint and recommend credits
+        Input example: {'monthly_output': 1000, 'energy_source': 'coal', 'raw_material_tons': 500}
+        """
+        # Simulation of industrial footprint calculation factors
+        emission_factors = {
+            'coal': 0.95,       # tCO2 per unit
+            'natural_gas': 0.45,
+            'grid': 0.65,
+            'renewable': 0.05
+        }
+        
+        energy_type = production_data.get('energy_source', 'grid')
+        factor = emission_factors.get(energy_type, 0.65)
+        
+        estimated_emissions = (production_data.get('monthly_output', 0) * 0.2) + \
+                              (production_data.get('raw_material_tons', 0) * factor)
+        
+        recommendation = round(estimated_emissions * 1.2, 2) # Buffer for Net Zero
+        
+        return {
+            'estimated_monthly_emissions': round(estimated_emissions, 2),
+            'recommended_credits': recommendation,
+            'net_zero_path': f"To reach Net Zero this month, you need {recommendation} tCO2e credits.",
+            'efficiency_score': 74.5 if energy_type == 'grid' else 92.1
+        }
         
     def register_company(self, company_name, industry, country, wallet_address, email=None):
         """Register a manufacturing company on the platform"""

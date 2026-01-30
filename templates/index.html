@@ -10,6 +10,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/marketplace.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -125,6 +126,19 @@
 
             <!-- Marketplace View (Hidden by default) -->
             <section id="marketplaceView" class="view hidden">
+                <!-- Market Intelligence Ticker -->
+                <div class="market-ticker">
+                    <div class="ticker-content">
+                        <span class="ticker-label">LIVE MARKET INDEX:</span>
+                        <span class="ticker-value" id="liveMarketPrice">$0.00</span>
+                        <span class="ticker-change" id="marketPriceChange">+0.00%</span>
+                        <span class="ticker-divider">|</span>
+                        <span class="ticker-item">EU ETS: <span class="v">$84.20</span></span>
+                        <span class="ticker-item">US RGGI: <span class="v">$15.45</span></span>
+                        <span class="ticker-item">CNW: <span class="v">$9.12</span></span>
+                    </div>
+                </div>
+
                 <!-- Market Overview Stats -->
                 <section class="market-stats-grid">
                     <div class="stat-card">
@@ -168,7 +182,38 @@
                 <section class="action-bar">
                     <button id="registerCompanyBtn" class="btn-primary">Register Company</button>
                     <button id="sellCreditsBtn" class="btn-secondary">Sell Carbon Credits</button>
+                    <button id="predictFootprintBtn" class="btn-accent">AI Footprint Predictor</button>
                     <button id="buyCreditsBtn" class="btn-primary">Fast Match (Buy)</button>
+                </section>
+
+                <!-- Market Analytics Section -->
+                <section class="marketplace-section analytics-section">
+                    <div class="section-header">
+                        <h2>Market Analytics & Trends</h2>
+                    </div>
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <h3>Price History (14 Days)</h3>
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                        <div class="trending-regions">
+                            <h3>Trending Verified Regions</h3>
+                            <div id="trendingList">
+                                <div class="trend-item">
+                                    <span class="region">Amazon Basin</span>
+                                    <span class="t-badge up">+12.4%</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span class="region">SE Asia Reforestation</span>
+                                    <span class="t-badge up">+8.1%</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span class="region">Nordic Green Tech</span>
+                                    <span class="t-badge down">-2.4%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Marketplace Listings -->
@@ -354,6 +399,51 @@
                     </div>
                     <div id="buyResult" class="result-message hidden"></div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carbon Footprint Predictor Modal -->
+    <div id="footprintModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🤖 AI Carbon Footprint Predictor</h2>
+                <button class="close-modal" data-modal="footprintModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="footprintForm" class="marketplace-form">
+                    <div class="form-group">
+                        <label for="monthlyOutput">Monthly Production Output (Units)</label>
+                        <input type="number" id="monthlyOutput" required placeholder="e.g. 5000">
+                    </div>
+                    <div class="form-group">
+                        <label for="energySource">Primary Energy Source</label>
+                        <select id="energySource" required>
+                            <option value="grid">Main Electricity Grid</option>
+                            <option value="coal">Coal Powered</option>
+                            <option value="natural_gas">Natural Gas</option>
+                            <option value="renewable">Solar/Wind (Renewable)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rawMaterial">Raw Material Consumption (Tons)</label>
+                        <input type="number" id="rawMaterial" required placeholder="e.g. 200">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Calculate Path to Net-Zero</button>
+                    </div>
+                </form>
+                <div id="footprintResult" class="footprint-result-box hidden">
+                    <div class="res-item">
+                        <span class="l">Estimated Monthly Footprint:</span>
+                        <span class="v" id="estEmissions">0 tCO2e</span>
+                    </div>
+                    <div class="res-item highlight">
+                        <span class="l">Recommended Offset Credits:</span>
+                        <span class="v" id="recCredits">0 tCO2e</span>
+                    </div>
+                    <p id="netZeroPath" style="font-size: 0.9rem; color: var(--accent); margin-top: 1rem;"></p>
+                </div>
             </div>
         </div>
     </div>

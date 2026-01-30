@@ -254,6 +254,25 @@ def get_market_stats():
         'stats': stats
     })
 
+@app.route('/api/marketplace/intelligence', methods=['GET'])
+def get_market_intelligence():
+    """Get live market prices and price history"""
+    intel = marketplace.get_market_intelligence()
+    return jsonify({
+        'success': True,
+        'intelligence': intel
+    })
+
+@app.route('/api/marketplace/predict-footprint', methods=['POST'])
+def predict_footprint():
+    """Predict company footprint based on production data"""
+    data = request.json
+    result = marketplace.predict_carbon_footprint(data)
+    return jsonify({
+        'success': True,
+        'prediction': result
+    })
+
 @app.route('/api/marketplace/company/<company_id>', methods=['GET'])
 def get_company_profile(company_id):
     """Get company profile and trading history"""

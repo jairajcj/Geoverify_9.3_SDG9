@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     const tradersModal = document.getElementById('tradersModal');
     const activeTradersCard = document.getElementById('activeTradersCard');
+    const footprintModal = document.getElementById('footprintModal');
+    const footprintBtn = document.getElementById('predictFootprintBtn');
+
+    let priceChart = null;
 
     // Close buttons
     const closeButtons = document.querySelectorAll('.close-modal');
@@ -21,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     registerBtn.addEventListener('click', () => openModal(registerModal));
     sellBtn.addEventListener('click', () => openModal(sellModal));
     buyBtn.addEventListener('click', () => openModal(buyModal));
+    if (footprintBtn) {
+        footprintBtn.addEventListener('click', () => openModal(footprintModal));
+    }
     if (activeTradersCard) {
         activeTradersCard.addEventListener('click', () => {
             openModal(tradersModal);
@@ -47,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('registerForm').addEventListener('submit', handleRegisterCompany);
     document.getElementById('sellForm').addEventListener('submit', handleCreateListing);
     document.getElementById('buyForm').addEventListener('submit', handleBuyOrder);
+    if (document.getElementById('footprintForm')) {
+        document.getElementById('footprintForm').addEventListener('submit', handlePredictFootprint);
+    }
 
     // Refresh buttons
     refreshListingsBtn.addEventListener('click', loadMarketplaceListings);
@@ -60,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadMarketplaceListings();
         loadTransactions();
         loadActiveTraders(); // Keep traders list warm
+        loadMarketIntelligence(); // New Intelligence Layer
     };
 
     // Initial load
@@ -100,6 +111,99 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error loading market stats:', error);
+        }
+    }
+
+    async function loadMarketIntelligence() {
+        try {
+            const response = await fetch('/api/marketplace/intelligence');
+            const data = await response.json();
+
+            if (data.success) {
+                const intel = data.intelligence;
+
+                // Update Ticker
+                document.getElementById('liveMarketPrice').textContent = `$${intel.live_price}`;
+                const changeEl = document.getElementById('marketPriceChange');
+                changeEl.textContent = `${intel.price_change_14d >= 0 ? '+' : ''}${intel.price_change_14d}%`;
+                changeEl.className = intel.price_change_14d >= 0 ? 'ticker-change positive' : 'ticker-change negative';
+
+                // Store fair value for inquiry system
+                window.currentFairValue = intel.live_price;
+                window.fairValueRange = intel.fair_value_range;
+
+                // Update Chart
+                updatePriceChart(intel.market_history);
+            }
+        } catch (error) {
+            console.error('Error loading market intelligence:', error);
+        }
+    }
+
+    function updatePriceChart(history) {
+        const ctx = document.getElementById('priceChart');
+        if (!ctx) return;
+
+        const labels = history.map(h => `Day ${h.day + 1}`);
+        const prices = history.map(h => h.price);
+
+        if (priceChart) {
+            priceChart.destroy();
+        }
+
+        priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Market Price ($)',
+                    data: prices,
+                    borderColor: '#00ff9d',
+                    backgroundColor: 'rgba(0, 255, 157, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                    x: { grid: { display: false }, ticks: { color: '#888' } }
+                }
+            }
+        });
+    }
+
+    async function handlePredictFootprint(e) {
+        e.preventDefault();
+        const resultDiv = document.getElementById('footprintResult');
+        resultDiv.classList.add('hidden');
+
+        const formData = {
+            monthly_output: parseFloat(document.getElementById('monthlyOutput').value),
+            energy_source: document.getElementById('energySource').value,
+            raw_material_tons: parseFloat(document.getElementById('rawMaterial').value)
+        };
+
+        try {
+            const response = await fetch('/api/marketplace/predict-footprint', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                document.getElementById('estEmissions').textContent = `${data.prediction.estimated_monthly_emissions} tCO2e`;
+                document.getElementById('recCredits').textContent = `${data.prediction.recommended_credits} tCO2e`;
+                document.getElementById('netZeroPath').textContent = data.prediction.net_zero_path;
+                resultDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error predicting footprint:', error);
         }
     }
 
@@ -447,7 +551,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Global functions for inline onclick handlers
     window.sendInquiry = function (listingId, sellerName) {
-        const buyerCompanyId = prompt(`Enter your Company ID to send inquiry to ${sellerName}:`);
+        const fairValueMsg = window.currentFairValue ?
+            `Note: The Fair Market Value is currently $${window.currentFairValue}.` : "";
+
+        const buyerCompanyId = prompt(`${fairValueMsg}\nEnter your Company ID to send inquiry to ${sellerName}:`);
         if (!buyerCompanyId) return;
 
         fetch('/api/marketplace/inquiry', {
