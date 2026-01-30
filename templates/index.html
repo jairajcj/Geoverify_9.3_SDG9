@@ -9,6 +9,7 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/marketplace.css">
 </head>
 
 <body>
@@ -19,10 +20,11 @@
                 <span class="icon">🌍</span> GeoVerify
             </div>
             <ul class="nav-links">
-                <li class="active">Dashboard</li>
-                <li>Audit Log</li>
-                <li>Sentinel Config</li>
-                <li>Settings</li>
+                <li data-view="dashboard" class="active">Dashboard</li>
+                <li data-view="audit">Audit Log</li>
+                <li data-view="sentinel">Sentinel Config</li>
+                <li data-view="marketplace">Marketplace</li>
+                <li data-view="settings">Settings</li>
             </ul>
             <div class="status-panel">
                 <div class="status-item">
@@ -39,82 +41,162 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <h1>Sentinel Dashboard</h1>
+                <h1 id="pageTitle">Sentinel Dashboard</h1>
                 <div class="user-profile">
                     <span>Admin</span>
                     <div class="avatar"></div>
                 </div>
             </header>
 
-            <section class="dashboard-grid">
-                <!-- Map / Input Section -->
-                <div class="card map-card">
-                    <div class="card-header">
-                        <h2>New Asset Verification</h2>
-                        <span class="badge live">LIVE FEED</span>
-                    </div>
-                    <div class="map-interface">
-                        <div class="coordinates-input">
-                            <input type="text" id="latInput" placeholder="Latitude (e.g., -3.4653)" value="-3.4653">
-                            <input type="text" id="lonInput" placeholder="Longitude (e.g., 62.2159)" value="62.2159">
-                            <button id="verifyBtn" class="btn-primary">
-                                <span class="btn-text">Verify & Mine</span>
-                                <div class="loader hidden"></div>
-                            </button>
-                            <button id="estimateBtn" class="btn-secondary">
-                                <span class="btn-text">Estimate Credits</span>
-                            </button>
+            <section id="dashboardView" class="view">
+                <section class="dashboard-grid">
+                    <!-- Map / Input Section -->
+                    <div class="card map-card">
+                        <div class="card-header">
+                            <h2>New Asset Verification</h2>
+                            <span class="badge live">LIVE FEED</span>
+                        </div>
+                        <div class="map-interface">
+                            <div class="coordinates-input">
+                                <input type="text" id="latInput" placeholder="Latitude (e.g., -3.4653)" value="-3.4653">
+                                <input type="text" id="lonInput" placeholder="Longitude (e.g., 62.2159)"
+                                    value="62.2159">
+                                <button id="verifyBtn" class="btn-primary">
+                                    <span class="btn-text">Verify & Mine</span>
+                                    <div class="loader hidden"></div>
+                                </button>
+                                <button id="estimateBtn" class="btn-secondary">
+                                    <span class="btn-text">Estimate Credits</span>
+                                </button>
 
-                        </div>
-                        <div class="visualizer" id="visualizer">
-                            <div class="scanning-overlay hidden"></div>
-                            <div class="placeholder-text">Satellite Uplink Ready...</div>
+                            </div>
+                            <div class="visualizer" id="visualizer">
+                                <div class="scanning-overlay hidden"></div>
+                                <div class="placeholder-text">Satellite Uplink Ready...</div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Live Results -->
-                <div class="card result-card">
-                    <div class="card-header">
-                        <h2>Analysis Result</h2>
+                    <!-- Live Results -->
+                    <div class="card result-card">
+                        <div class="card-header">
+                            <h2>Analysis Result</h2>
+                        </div>
+                        <div class="metrics-grid" id="resultsContainer">
+                            <div class="metric">
+                                <span class="label">Asset Status</span>
+                                <span class="value" id="statusValue">--</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Green Cover</span>
+                                <span class="value" id="coverValue">--%</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">AI Confidence</span>
+                                <span class="value" id="confidenceValue">--%</span>
+                            </div>
+                            <div class="metric highlight">
+                                <span class="label">Carbon Credits</span>
+                                <span class="value" id="creditsValue">-- tCO2e</span>
+                            </div>
+                            <div class="metric full-width"
+                                style="grid-column: 1 / -1; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem;">
+                                <span class="label">Sentinel Report</span>
+                                <span class="value" id="reasonValue"
+                                    style="font-size: 0.9rem; font-weight: normal; color: #aaa;">Waiting for
+                                    scan...</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="metrics-grid" id="resultsContainer">
-                        <div class="metric">
-                            <span class="label">Asset Status</span>
-                            <span class="value" id="statusValue">--</span>
-                        </div>
-                        <div class="metric">
-                            <span class="label">Green Cover</span>
-                            <span class="value" id="coverValue">--%</span>
-                        </div>
-                        <div class="metric">
-                            <span class="label">AI Confidence</span>
-                            <span class="value" id="confidenceValue">--%</span>
-                        </div>
-                        <div class="metric highlight">
-                            <span class="label">Carbon Credits</span>
-                            <span class="value" id="creditsValue">-- tCO2e</span>
-                        </div>
-                        <div class="metric full-width"
-                            style="grid-column: 1 / -1; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem;">
-                            <span class="label">Sentinel Report</span>
-                            <span class="value" id="reasonValue"
-                                style="font-size: 0.9rem; font-weight: normal; color: #aaa;">Waiting for scan...</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Blockchain Feed -->
-                <div class="card wide-card">
-                    <div class="card-header">
-                        <h2>Immutable Ledger Stream</h2>
-                        <button id="refreshChain" class="btn-icon">↻</button>
+                    <!-- Blockchain Feed -->
+                    <div class="card wide-card">
+                        <div class="card-header">
+                            <h2>Immutable Ledger Stream</h2>
+                            <button id="refreshChain" class="btn-icon">↻</button>
+                        </div>
+                        <div class="ledger-feed" id="ledgerFeed">
+                            <!-- Blocks will be injected here -->
+                            <div class="ledger-item empty-state">Waiting for new blocks...</div>
+                        </div>
                     </div>
-                    <div class="ledger-feed" id="ledgerFeed">
-                        <!-- Blocks will be injected here -->
-                        <div class="ledger-item empty-state">Waiting for new blocks...</div>
+                </section>
+            </section>
+
+            <!-- Marketplace View (Hidden by default) -->
+            <section id="marketplaceView" class="view hidden">
+                <!-- Market Overview Stats -->
+                <section class="market-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total Volume</span>
+                            <span class="stat-value" id="totalVolume">$0</span>
+                        </div>
                     </div>
-                </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📜</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Active Listings</span>
+                            <span class="stat-value" id="activeListings">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🤝</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total Trades</span>
+                            <span class="stat-value" id="totalTrades">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📉</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Avg Price</span>
+                            <span class="stat-value" id="avgPrice">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-content">
+                            <span class="stat-label">Active Traders</span>
+                            <span class="stat-value" id="activeTraders">0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Action Bar -->
+                <section class="action-bar">
+                    <button id="registerCompanyBtn" class="btn-primary">Register Company</button>
+                    <button id="sellCreditsBtn" class="btn-secondary">Sell Carbon Credits</button>
+                    <button id="buyCreditsBtn" class="btn-primary">Fast Match (Buy)</button>
+                </section>
+
+                <!-- Marketplace Listings -->
+                <section class="marketplace-section">
+                    <div class="section-header">
+                        <h2>Verified Credit Listings</h2>
+                        <div class="filter-controls">
+                            <input type="number" id="maxPriceFilter" placeholder="Max Price ($)" class="filter-input">
+                            <input type="number" id="minAmountFilter" placeholder="Min Credits" class="filter-input">
+                            <button id="applyFiltersBtn" class="btn-icon">🔍</button>
+                            <button id="refreshListingsBtn" class="btn-icon">↻</button>
+                        </div>
+                    </div>
+                    <div class="listings-grid" id="listingsGrid">
+                        <div class="loading-spinner">Loading available credits...</div>
+                    </div>
+                </section>
+
+                <!-- Recent Transactions -->
+                <section class="transactions-section">
+                    <div class="section-header">
+                        <h2>Recent Network Transactions</h2>
+                        <button id="refreshTransactionsBtn" class="btn-icon">↻</button>
+                    </div>
+                    <div class="transactions-list" id="transactionsList">
+                        <div class="loading-spinner">Fetching ledger history...</div>
+                    </div>
+                </section>
             </section>
         </main>
     </div>
@@ -150,7 +232,115 @@
         </div>
     </div>
 
+    <!-- Register Company Modal -->
+    <div id="registerModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏢 Register Your Enterprise</h2>
+                <button class="close-modal" data-modal="registerModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm" class="marketplace-form">
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" required placeholder="e.g. GreenTech Industries">
+                    </div>
+                    <div class="form-group">
+                        <label for="industry">Industry Sector</label>
+                        <select id="industry" required>
+                            <option value="">Select Sector</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Energy">Energy</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Forestry">Forestry</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <input type="text" id="country" required placeholder="e.g. Germany">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Complete Registration</button>
+                    </div>
+                    <div id="registrationResult" class="result-message hidden"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sell Credits Modal -->
+    <div id="sellModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🌿 List Carbon Credits</h2>
+                <button class="close-modal" data-modal="sellModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="sellForm" class="marketplace-form">
+                    <div class="form-group">
+                        <label for="sellerCompanyId">Company ID</label>
+                        <input type="text" id="sellerCompanyId" required placeholder="Enter your registered ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="creditAmount">Credit Amount (tCO2e)</label>
+                        <input type="number" id="creditAmount" step="0.01" required placeholder="e.g. 150.50">
+                    </div>
+                    <div class="form-group">
+                        <label for="pricePerCredit">Price per Credit ($)</label>
+                        <input type="number" id="pricePerCredit" step="0.01" required placeholder="e.g. 25.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="creditLocation">Project Location</label>
+                        <input type="text" id="creditLocation" placeholder="e.g. Amazon Rainforest, Brazil">
+                    </div>
+                    <div class="form-group">
+                        <label for="creditDescription">Description</label>
+                        <textarea id="creditDescription" rows="3"
+                            placeholder="Describe the verification source..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Create Listing</button>
+                    </div>
+                    <div id="sellResult" class="result-message hidden"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Credits Modal (Manual Order) -->
+    <div id="buyModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 Create Purchase Order</h2>
+                <button class="close-modal" data-modal="buyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="buyForm" class="marketplace-form">
+                    <div class="form-group">
+                        <label for="buyerCompanyId">Company ID</label>
+                        <input type="text" id="buyerCompanyId" required placeholder="Enter your registered ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="buyAmount">Desired Amount (tCO2e)</label>
+                        <input type="number" id="buyAmount" step="0.01" required placeholder="e.g. 100.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="maxPrice">Maximum Price ($/credit)</label>
+                        <input type="number" id="maxPrice" step="0.01" required placeholder="e.g. 30.00">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Place Buy Order</button>
+                    </div>
+                    <div id="buyResult" class="result-message hidden"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/marketplace.js"></script>
 </body>
 
 </html>

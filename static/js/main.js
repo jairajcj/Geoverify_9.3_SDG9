@@ -80,6 +80,38 @@ document.addEventListener('DOMContentLoaded', () => {
             reasonEl.textContent = 'Analysis Complete';
             reasonEl.style.color = '#aaa';
         }
+
+        // Add "List on Marketplace" button if verified
+        const existingListBtn = document.getElementById('listOnMarketplaceBtn');
+        if (existingListBtn) existingListBtn.remove();
+
+        if (data.status === 'VERIFIED') {
+            const listBtn = document.createElement('button');
+            listBtn.id = 'listOnMarketplaceBtn';
+            listBtn.className = 'btn-primary';
+            listBtn.style.marginTop = '1rem';
+            listBtn.style.width = '100%';
+            listBtn.innerHTML = '<span>🚀 List on Marketplace</span>';
+            listBtn.onclick = () => {
+                // Switch to marketplace view
+                document.getElementById('dashboardView').classList.add('hidden');
+                document.getElementById('marketplaceView').classList.remove('hidden');
+                document.getElementById('pageTitle').textContent = 'B2B Carbon Marketplace';
+
+                // Update nav links active state
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('[data-view="marketplace"]').classList.add('active');
+
+                // Open sell modal directly
+                const sellModal = document.getElementById('sellModal');
+                if (sellModal) {
+                    sellModal.classList.remove('hidden');
+                    document.getElementById('creditAmount').value = data.carbon_credits;
+                    document.getElementById('creditLocation').value = `${data.latitude}, ${data.longitude}`;
+                }
+            };
+            resultsContainer.appendChild(listBtn);
+        }
     }
 
 
@@ -125,16 +157,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add click handlers to nav links
     navLinks.forEach((link, index) => {
         link.addEventListener('click', () => {
+            const view = link.getAttribute('data-view');
+            if (!view) return;
+
             // Remove active from all
             navLinks.forEach(l => l.classList.remove('active'));
             // Add active to clicked
             link.classList.add('active');
 
-            // Handle different nav items
-            if (index === 1) { // Audit Log
+            // Handle View Switching
+            if (view === 'dashboard') {
+                document.getElementById('dashboardView').classList.remove('hidden');
+                document.getElementById('marketplaceView').classList.add('hidden');
+                document.getElementById('pageTitle').textContent = 'Sentinel Dashboard';
+            } else if (view === 'marketplace') {
+                document.getElementById('dashboardView').classList.add('hidden');
+                document.getElementById('marketplaceView').classList.remove('hidden');
+                document.getElementById('pageTitle').textContent = 'B2B Carbon Marketplace';
+                // Trigger marketplace refresh
+                if (window.loadMarketplaceData) window.loadMarketplaceData();
+            } else if (view === 'audit') {
                 openAuditLog();
-            } else if (index === 2) { // Sentinel Config
+            } else if (view === 'sentinel') {
                 openSentinelLog();
+            } else if (view === 'settings') {
+                alert('Settings panel coming soon! (Integrated SPA Mode)');
             }
         });
     });

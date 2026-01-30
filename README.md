@@ -84,3 +84,104 @@ Once the server is running, open your web browser and navigate to:
 3.  View Results**: Watch the "Green Cover" metrics update in real-time.
 4.  *Check the Ledger**: See the new block appear in the "Immutable Ledger Stream" below.
 5. not only works on a situated land coordinates it works on all as in the similarity to the geolocation findings 
+
+## 🏭 NEW: B2B Carbon Credit Marketplace
+
+GeoVerify now includes a **comprehensive blockchain-based marketplace** for manufacturing companies to trade verified carbon credits in a B2B environment.
+
+### Marketplace Features
+
+1. **Company Registration**
+   - Register your manufacturing company on the platform
+   - Get a unique Company ID for trading
+   - Track your trading history and reputation
+
+2. **Sell Carbon Credits**
+   - List verified carbon credits for sale
+   - Set your own pricing per credit
+   - Include verification data from GeoVerify Sentinel
+   - Automatic blockchain recording of all listings
+
+3. **Buy Carbon Credits**
+   - Browse active listings from verified sellers
+   - Filter by price and amount
+   - Automatic order matching with best prices
+   - Instant blockchain-verified transactions
+
+4. **Market Analytics**
+   - Real-time market statistics
+   - Total trading volume tracking
+   - Average price per credit
+   - Active listings and transaction counts
+
+### How to Use the Marketplace
+
+1. **Access the Marketplace**
+   - Navigate to **http://127.0.0.1:5000/marketplace**
+   - Or click "Marketplace" in the sidebar
+
+2. **Initialize Demo Data** (Optional)
+   - Use the demo data endpoint to populate the marketplace:
+   ```bash
+   curl -X POST http://127.0.0.1:5000/api/marketplace/init-demo
+   ```
+
+3. **Register Your Company**
+   - Click "Register Company" button
+   - Fill in company details (name, industry, country)
+   - Save your Company ID for future transactions
+
+4. **List Credits for Sale**
+   - Click "Sell Credits" button
+   - Enter your Company ID
+   - Specify credit amount and price
+   - Add location and description
+   - Submit to create listing
+
+5. **Purchase Credits**
+   - Browse active listings
+   - Click "Buy Now" on any listing
+   - Enter your Company ID
+   - Transaction is automatically recorded on blockchain
+
+### Complete Workflow
+
+```
+1. Verify Location (Dashboard)
+   ↓
+2. Get VERIFIED/FLAGGED Status
+   ↓
+3. Calculate Carbon Credits
+   ↓
+4. List Credits on Marketplace
+   ↓
+5. B2B Trading Begins
+   ↓
+6. All Transactions Recorded on Blockchain
+```
+
+### API Endpoints
+
+**Marketplace APIs:**
+- `POST /api/marketplace/register` - Register a company
+- `POST /api/marketplace/create-listing` - Create a listing
+- `GET /api/marketplace/listings` - Get all listings
+- `POST /api/marketplace/buy` - Create buy order
+- `GET /api/marketplace/transactions` - Get transaction history
+- `GET /api/marketplace/stats` - Get market statistics
+- `GET /api/marketplace/company/<id>` - Get company profile
+
+**Verification APIs:**
+- `POST /api/verify` - Verify location and calculate credits
+- `POST /api/estimate` - Estimate credits without blockchain
+- `GET /api/audit-log` - View audit log
+- `GET /api/sentinel-log` - View sentinel activity
+
+## Technology Stack
+
+- **Frontend**: HTML5, CSS3 (with Glassmorphism), Vanilla JavaScript
+- **Backend**: Python 3.8+ (Flask Framework)
+- **AI Engine**: GeoSentinel (Geospatial Verification)
+- **Blockchain**: Custom Lightweight Blockchain
+- **Marketplace**: B2B Trading Platform with Order Matching
+ 
