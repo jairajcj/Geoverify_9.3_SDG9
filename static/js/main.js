@@ -81,28 +81,30 @@ document.addEventListener('DOMContentLoaded', () => {
             reasonEl.style.color = '#aaa';
         }
 
-        // Add "List on Marketplace" button if verified
-        const existingListBtn = document.getElementById('listOnMarketplaceBtn');
-        if (existingListBtn) existingListBtn.remove();
+        // Add "List on Marketplace" and "View Certificate" buttons if verified
+        const existingBtnContainer = document.getElementById('resultActions');
+        if (existingBtnContainer) existingBtnContainer.remove();
 
         if (data.status === 'VERIFIED') {
+            const btnContainer = document.createElement('div');
+            btnContainer.id = 'resultActions';
+            btnContainer.style.display = 'flex';
+            btnContainer.style.gap = '0.5rem';
+            btnContainer.style.marginTop = '1rem';
+
             const listBtn = document.createElement('button');
-            listBtn.id = 'listOnMarketplaceBtn';
             listBtn.className = 'btn-primary';
-            listBtn.style.marginTop = '1rem';
-            listBtn.style.width = '100%';
-            listBtn.innerHTML = '<span>🚀 List on Marketplace</span>';
+            listBtn.style.flex = '1';
+            listBtn.innerHTML = '<span>🚀 List on Market</span>';
             listBtn.onclick = () => {
                 // Switch to marketplace view
                 document.getElementById('dashboardView').classList.add('hidden');
                 document.getElementById('marketplaceView').classList.remove('hidden');
                 document.getElementById('pageTitle').textContent = 'B2B Carbon Marketplace';
 
-                // Update nav links active state
                 navLinks.forEach(l => l.classList.remove('active'));
                 document.querySelector('[data-view="marketplace"]').classList.add('active');
 
-                // Open sell modal directly
                 const sellModal = document.getElementById('sellModal');
                 if (sellModal) {
                     sellModal.classList.remove('hidden');
@@ -110,8 +112,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('creditLocation').value = `${data.latitude}, ${data.longitude}`;
                 }
             };
-            resultsContainer.appendChild(listBtn);
+
+            const certBtn = document.createElement('button');
+            certBtn.className = 'btn-secondary';
+            certBtn.style.flex = '1';
+            certBtn.innerHTML = '<span>📜 View Certificate</span>';
+            certBtn.onclick = () => showCertificate(data);
+
+            btnContainer.appendChild(listBtn);
+            btnContainer.appendChild(certBtn);
+            resultsContainer.appendChild(btnContainer);
         }
+    }
+
+    function showCertificate(data) {
+        const modal = document.getElementById('certificateModal');
+        document.getElementById('certLocation').textContent = `(${data.latitude}, ${data.longitude})`;
+        document.getElementById('certCover').textContent = `${data.green_cover_percentage}%`;
+        document.getElementById('certCredits').textContent = `${data.carbon_credits} tCO2e`;
+        document.getElementById('certHash').textContent = 'SHA-256:' + Math.random().toString(16).substring(2, 40);
+        document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+        document.getElementById('certId').textContent = 'GV-' + Math.floor(Math.random() * 900000 + 100000);
+
+        modal.classList.remove('hidden');
     }
 
 
@@ -181,10 +204,53 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (view === 'sentinel') {
                 openSentinelLog();
             } else if (view === 'settings') {
-                alert('Settings panel coming soon! (Integrated SPA Mode)');
+                document.getElementById('dashboardView').classList.add('hidden');
+                document.getElementById('marketplaceView').classList.add('hidden');
+                document.getElementById('settingsView').classList.remove('hidden');
+                document.getElementById('pageTitle').textContent = 'System Settings';
             }
         });
     });
+
+    // === SETTINGS TAB SWITCHING ===
+    const settingsTabs = document.querySelectorAll('.settings-tabs li');
+    const settingsContents = document.querySelectorAll('.settings-tab-content');
+
+    settingsTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetId = `settings-${tab.getAttribute('data-tab')}`;
+
+            // Update tabs
+            settingsTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Update contents
+            settingsContents.forEach(content => {
+                content.classList.add('hidden');
+                if (content.id === targetId) {
+                    content.classList.remove('hidden');
+                }
+            });
+        });
+    });
+
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', () => {
+            const btn = saveSettingsBtn;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>⏳ Saving...</span>';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = '<span>✅ Saved Successfully</span>';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            }, 1000);
+        });
+    }
 
     // Close modal handlers
     closeButtons.forEach(btn => {
@@ -337,4 +403,23 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '<div class="error-state">Failed to load sentinel log</div>';
         }
     }
+
+    // === DATA FEED SIMULATION ===
+    const visualizer = document.getElementById('visualizer');
+    function simulateDataFeed() {
+        if (!visualizer) return;
+        const line = document.createElement('div');
+        line.style.position = 'absolute';
+        line.style.height = '1px';
+        line.style.width = '100%';
+        line.style.background = 'rgba(0, 255, 157, 0.1)';
+        line.style.top = Math.random() * 100 + '%';
+        line.style.left = '0';
+        line.style.pointerEvents = 'none';
+        visualizer.appendChild(line);
+
+        setTimeout(() => line.remove(), 2000);
+    }
+
+    setInterval(simulateDataFeed, 500);
 });

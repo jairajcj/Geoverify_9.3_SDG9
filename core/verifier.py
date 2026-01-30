@@ -18,6 +18,25 @@ class GeoSentinel:
         """
         reasons = []
         
+        # 0. ANTI-DOUBLE COUNTING CHECK
+        # Check if coordinates within a 500m radius have already been verified
+        for past in self.verification_history:
+            if past['status'] == "VERIFIED":
+                dist_lat = abs(lat - past['latitude'])
+                dist_lon = abs(lon - past['longitude'])
+                # Roughly 0.005 approx 500m
+                if dist_lat < 0.005 and dist_lon < 0.005:
+                    return {
+                        "latitude": lat,
+                        "longitude": lon,
+                        "green_cover_percentage": past['green_cover_percentage'],
+                        "ai_confidence": 100.0,
+                        "status": "FLAGGED",
+                        "carbon_credits": 0.0,
+                        "reasons": ["CRITICAL: Potential Double Counting Detected", f"Asset already recorded in Block #{random.randint(100,999)}"],
+                        "timestamp": time.time()
+                    }
+
         # 1. SPECIAL DEMO WHITELIST
         # If the user enters the specific demo coordinates, give a perfect result.
         if abs(lat - 11.4102) < 0.001 and abs(lon - 76.6950) < 0.001:
@@ -27,12 +46,31 @@ class GeoSentinel:
         else:
             # 2. Standard Simulation
             # Deterministic capability based on coords for demo consistency
-            random.seed(lat + lon) 
+            random.seed(lat * 123.45 + lon * 67.89) 
             
-            # Widen the range to ensure we see both bad and good results 
-            # BIAS: Weighted towards "verified" (forests) to match user expectation
-            green_cover = random.uniform(35, 98) # Mostly > 45%
-            authenticity_score = random.uniform(0.78, 0.99) # Check score
+            # Mali/Sahel/Sahara Check (Arid Zones)
+            # Lat 12-35 and North Africa/Middle East longitudes are often desert
+            is_arid_zone = (12 <= lat <= 35) and (-20 <= lon <= 50)
+            
+            # Ocean Detection Heuristic (Simplified for Demo)
+            # Most of the Indian Ocean, South Atlantic, and Pacific areas
+            is_ocean = (lat < 10 and lon > 50) or (lat < 0 and -20 < lon < 20) or (lat < 20 and -180 < lon < -100)
+
+            if is_arid_zone:
+                # Desert zones have very low green cover
+                green_cover = random.uniform(2, 18) 
+                authenticity_score = random.uniform(0.65, 0.95)
+                if green_cover < 10:
+                    reasons.append("High Aridity Index - Desert Landscape Detected")
+            elif is_ocean:
+                # Ocean/Water bodies
+                green_cover = random.uniform(0, 5)
+                authenticity_score = random.uniform(0.90, 0.99) # AI is very sure it's water
+                reasons.append("Geospatial Signature Identifies Open Water / Marine Environment")
+            else:
+                # Weighted towards "verified" (forests) only in non-harsh areas
+                green_cover = random.uniform(35, 98)
+                authenticity_score = random.uniform(0.78, 0.99)
 
         # 3. Decision Logic
         is_valid = True

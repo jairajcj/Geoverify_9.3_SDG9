@@ -132,6 +132,11 @@ class CarbonMarketplace:
         if seller_id not in self.companies:
             return {"success": False, "error": "Company not registered"}
         
+        # Prevent listing the same location twice
+        for existing in self.listings:
+            if existing['location'].strip() == location.strip() and existing['status'] == 'ACTIVE':
+                 return {"success": False, "error": "This location's credits are already listed for sale."}
+        
         listing_id = f"LST-{self.listing_id_counter}"
         self.listing_id_counter += 1
         
@@ -267,12 +272,14 @@ class CarbonMarketplace:
                     listing['status'] = 'SOLD_OUT'
                 break
         
-        # Update company stats
+        # Update company stats and reputation
         self.companies[buyer_id]['credits_owned'] += credit_amount
         self.companies[buyer_id]['total_trades'] += 1
+        self.companies[buyer_id]['reputation_score'] = min(100, self.companies[buyer_id]['reputation_score'] + 1)
         
         self.companies[seller_id]['credits_sold'] += credit_amount
         self.companies[seller_id]['total_trades'] += 1
+        self.companies[seller_id]['reputation_score'] = min(100, self.companies[seller_id]['reputation_score'] + 2)
         
         # Record on blockchain
         last_block = self.blockchain.get_last_block()

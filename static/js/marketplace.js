@@ -284,6 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="btn-details" onclick="viewListingDetails('${listing.listing_id}')">
                     Full Details
                 </button>
+                <button class="btn-secondary" style="padding: 0.8rem; font-size: 1.2rem;" title="View Verification Certificate" onclick="viewListingCertificate('${listing.listing_id}')">
+                    📜
+                </button>
             </div>
         `;
 
@@ -392,8 +395,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    window.viewCompanyProfile = function (companyId) {
-        alert("Detailed Company Profiles coming soon! ID: " + companyId);
+    window.viewCompanyProfile = async function (companyId) {
+        const modal = document.getElementById('companyProfileModal');
+        const transactionsList = document.getElementById('profileTransactions');
+        const listingsList = document.getElementById('profileListings');
+
+        try {
+            const response = await fetch(`/api/marketplace/company/${companyId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                const profile = data.profile;
+                document.getElementById('profileCompanyName').textContent = `🏢 ${profile.name}`;
+                document.getElementById('profileIndustry').textContent = profile.industry;
+                document.getElementById('profileCountry').textContent = profile.country;
+                document.getElementById('profileReputation').textContent = `${profile.reputation_score}/100`;
+
+                // Load Transactions
+                transactionsList.innerHTML = profile.transactions.length ? '' : '<p class="empty-state">No trades yet.</p>';
+                profile.transactions.slice(-5).forEach(t => {
+                    const item = document.createElement('div');
+                    item.className = 'mini-log-item';
+                    item.innerHTML = `<strong>${t.transaction_id}</strong>: Bought ${t.credit_amount} Credits`;
+                    transactionsList.appendChild(item);
+                });
+
+                // Load Listings
+                listingsList.innerHTML = profile.active_listings.length ? '' : '<p class="empty-state">No active listings.</p>';
+                profile.active_listings.forEach(l => {
+                    const item = document.createElement('div');
+                    item.className = 'mini-log-item';
+                    item.innerHTML = `<strong>${l.listing_id}</strong>: ${l.available_amount} Credits @ $${l.price_per_credit}`;
+                    listingsList.appendChild(item);
+                });
+
+                modal.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error loading company profile:', error);
+            alert("Failed to load company profile.");
+        }
+    };
+
+    window.viewListingCertificate = async function (listingId) {
+        try {
+            const response = await fetch('/api/marketplace/listings');
+            const data = await response.json();
+            const listing = data.listings.find(l => l.listing_id === listingId);
+
+            if (listing) {
+                const modal = document.getElementById('certificateModal');
+                document.getElementById('certLocation').textContent = listing.location;
+                document.getElementById('certCover').textContent = `98.5%`; // Simulated 
+                document.getElementById('certCredits').textContent = `${listing.available_amount} tCO2e`;
+                document.getElementById('certHash').textContent = 'SHA-256:' + listing.listing_id.repeat(4).substring(0, 40);
+                document.getElementById('certDate').textContent = new Date(listing.created_at * 1000).toLocaleDateString();
+                document.getElementById('certId').textContent = 'GV-' + listing.listing_id.split('-')[1];
+
+                modal.classList.remove('hidden');
+            }
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     function applyFilters() {
@@ -614,7 +677,26 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     };
 
-    window.viewListingDetails = function (listingId) {
-        alert(`Viewing details for listing: ${listingId}\n\nFull details feature coming soon!`);
+    window.viewListingDetails = async function (listingId) {
+        try {
+            const response = await fetch('/api/marketplace/listings');
+            const data = await response.json();
+            const listing = data.listings.find(l => l.listing_id === listingId);
+
+            if (listing) {
+                let info = `Listing: ${listing.listing_id}\n`;
+                info += `Seller: ${listing.seller_name}\n`;
+                info += `Quantity: ${listing.available_amount} tCO2e\n`;
+                info += `Price: $${listing.price_per_credit} per unit\n`;
+                info += `Location: ${listing.location}\n`;
+                info += `Description: ${listing.description || 'No description provided.'}\n\n`;
+                info += `Verification Source: GeoVerify Sentinel AI\n`;
+                info += `Blockchain Status: RECORDED ON POLYGON (Simulated)\n`;
+
+                alert(info);
+            }
+        } catch (e) {
+            console.error(e);
+        }
     };
 });

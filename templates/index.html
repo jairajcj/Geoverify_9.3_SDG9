@@ -213,6 +213,21 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="market-news-card">
+                            <h3>Network Intelligence News</h3>
+                            <div class="news-list">
+                                <div class="news-item">
+                                    <span class="news-tag">B2B</span>
+                                    <p>Global manufacturing demand for forest-based credits rises by 15% this quarter.
+                                    </p>
+                                </div>
+                                <div class="news-item">
+                                    <span class="news-tag highlight">TECH</span>
+                                    <p>GeoVerify Nodes upgrade to Sentinel v2.5 with improved ZK-Geospatial protocols.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -242,6 +257,120 @@
                         <div class="loading-spinner">Fetching ledger history...</div>
                     </div>
                 </section>
+            </section>
+
+            <!-- Settings View (Hidden by default) -->
+            <section id="settingsView" class="view hidden">
+                <div class="settings-container">
+                    <div class="settings-sidebar">
+                        <ul class="settings-tabs">
+                            <li class="active" data-tab="general">General</li>
+                            <li data-tab="security">Security & Node</li>
+                            <li data-tab="notifications">Notifications</li>
+                            <li data-tab="api">API Keys</li>
+                        </ul>
+                    </div>
+
+                    <div class="settings-main">
+                        <!-- General Settings -->
+                        <div id="settings-general" class="settings-tab-content">
+                            <div class="settings-header">
+                                <h2>General Preferences</h2>
+                            </div>
+                            <div class="settings-group">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Auto-Refresh Interval</label>
+                                        <p>Adjust how often the dashboard data refreshes (seconds)</p>
+                                    </div>
+                                    <input type="number" id="settingRefresh" value="30" class="setting-input-small">
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Visualizer Animations</label>
+                                        <p>Enable high-tech scanning overlays</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked id="settingAnimToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security & Node Settings -->
+                        <div id="settings-security" class="settings-tab-content hidden">
+                            <div class="settings-header">
+                                <h2>Security & Node Configuration</h2>
+                            </div>
+                            <div class="settings-group">
+                                <div class="form-group">
+                                    <label>Blockchain Provider URL</label>
+                                    <input type="text" value="https://polygon-mainnet.infura.io/v3/..."
+                                        class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sentinel Node Private Key</label>
+                                    <input type="password" value="********************************" class="form-input">
+                                    <small>Keys are encrypted at rest using AES-256 (Simulated)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification Settings -->
+                        <div id="settings-notifications" class="settings-tab-content hidden">
+                            <div class="settings-header">
+                                <h2>Notification Preferences</h2>
+                            </div>
+                            <div class="settings-group">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Email Alerts</label>
+                                        <p>Receive email when an inquiry is received</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked id="toggleEmailAlerts">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <label>Critical Failures</label>
+                                        <p>Alert on sentinel node disconnection</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- API Settings -->
+                        <div id="settings-api" class="settings-tab-content hidden">
+                            <div class="settings-header">
+                                <h2>API Management</h2>
+                            </div>
+                            <div class="settings-group">
+                                <div class="form-group">
+                                    <label>Satellite Data Provider API Key</label>
+                                    <div class="api-key-box">
+                                        <input type="text" placeholder="Enter API Key" class="form-input"
+                                            style="flex: 1;">
+                                        <button class="btn-primary" style="white-space: nowrap;">Connect
+                                            Provider</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-footer">
+                            <button class="btn-secondary" onclick="alert('Settings reset to default values.')">Reset to
+                                Default</button>
+                            <button class="btn-primary" id="saveSettingsBtn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
@@ -444,6 +573,101 @@
                     </div>
                     <p id="netZeroPath" style="font-size: 0.9rem; color: var(--accent); margin-top: 1rem;"></p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Company Profile Modal -->
+    <div id="companyProfileModal" class="modal hidden">
+        <div class="modal-content profile-modal">
+            <div class="modal-header">
+                <h2 id="profileCompanyName">🏢 Enterprise Profile</h2>
+                <button class="close-modal" data-modal="companyProfileModal">&times;</button>
+            </div>
+            <div class="modal-body" id="profileModalBody">
+                <div class="profile-header">
+                    <div class="profile-main-stats">
+                        <div class="p-stat">
+                            <span class="l">Industry</span>
+                            <span class="v" id="profileIndustry">--</span>
+                        </div>
+                        <div class="p-stat">
+                            <span class="l">Country</span>
+                            <span class="v" id="profileCountry">--</span>
+                        </div>
+                        <div class="p-stat">
+                            <span class="l">Reputation</span>
+                            <span class="v highlight" id="profileReputation">100/100</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-grid">
+                    <div class="profile-section">
+                        <h3>Trading History</h3>
+                        <div id="profileTransactions" class="mini-log"></div>
+                    </div>
+                    <div class="profile-section">
+                        <h3>Active Listings</h3>
+                        <div id="profileListings" class="mini-log"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verification Certificate Modal -->
+    <div id="certificateModal" class="modal hidden">
+        <div class="modal-content certificate-content">
+            <div class="modal-header no-border">
+                <button class="close-modal" data-modal="certificateModal">&times;</button>
+            </div>
+            <div class="certificate-frame">
+                <div class="cert-header">
+                    <div class="cert-logo">🌍 GEOVERIFY</div>
+                    <div class="cert-title">DIGITAL CARBON CREDIT CERTIFICATE</div>
+                </div>
+                <div class="cert-body">
+                    <p class="cert-intro">This certifies that the following geospatial asset has been verified by the
+                        GeoVerify AI Sentinel System and recorded on the immutable ledger.</p>
+
+                    <div class="cert-main-data">
+                        <div class="cert-row">
+                            <span class="cert-label">ASSET LOCATION:</span>
+                            <span class="cert-value" id="certLocation">--</span>
+                        </div>
+                        <div class="cert-row">
+                            <span class="cert-label">GREEN COVER:</span>
+                            <span class="cert-value" id="certCover">--</span>
+                        </div>
+                        <div class="cert-row">
+                            <span class="cert-label">CARBON CREDITS:</span>
+                            <span class="cert-value" id="certCredits">-- tCO2e</span>
+                        </div>
+                        <div class="cert-row">
+                            <span class="cert-label">BLOCK HASH:</span>
+                            <span class="cert-value mono" id="certHash">--</span>
+                        </div>
+                    </div>
+
+                    <div class="cert-footer">
+                        <div class="cert-seal">
+                            <div class="seal-inner">VERIFIED</div>
+                        </div>
+                        <div class="cert-meta">
+                            <p>DATE: <span id="certDate">--</span></p>
+                            <p>ID: <span id="certId">--</span></p>
+                            <div class="qr-placeholder"
+                                style="width: 60px; height: 60px; background: white; padding: 2px;">
+                                <div
+                                    style="width: 100%; height: 100%; border: 2px solid black; display: flex; align-items: center; justify-content: center; font-size: 0.4rem; color: black; font-weight: bold; text-align: center;">
+                                    BLOCKCHAIN<br>VERIFIED</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top: 1rem; display: flex; justify-content: center;">
+                <button class="btn-primary" onclick="window.print()">Download Certificate</button>
             </div>
         </div>
     </div>
