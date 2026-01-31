@@ -56,6 +56,15 @@ class GeoSentinel:
             # Most of the Indian Ocean, South Atlantic, and Pacific areas
             is_ocean = (lat < 10 and lon > 50) or (lat < 0 and -20 < lon < 20) or (lat < 20 and -180 < lon < -100)
 
+            # Urban Environment Heuristic (High building density, low vegetation)
+            # Simulating specific urban centers for demo (e.g., NYC, London, Tokyo)
+            is_urban = (abs(lat - 40.7128) < 0.2 and abs(lon - -74.0060) < 0.2) or \
+                       (abs(lat - 51.5074) < 0.2 and abs(lon - -0.1278) < 0.2) or \
+                       (abs(lat - 35.6895) < 0.2 and abs(lon - 139.6917) < 0.2)
+
+            # Ice/Tundra Heuristic (High Latitudes)
+            is_ice_zone = (lat > 65) or (lat < -60)
+
             if is_arid_zone:
                 # Desert zones have very low green cover
                 green_cover = random.uniform(2, 18) 
@@ -67,6 +76,16 @@ class GeoSentinel:
                 green_cover = random.uniform(0, 5)
                 authenticity_score = random.uniform(0.90, 0.99) # AI is very sure it's water
                 reasons.append("Geospatial Signature Identifies Open Water / Marine Environment")
+            elif is_urban:
+                # Urban areas
+                green_cover = random.uniform(5, 25)
+                authenticity_score = random.uniform(0.85, 0.98)
+                reasons.append("High Spectral Reflection - Dense Urban Infrastructure Detected")
+            elif is_ice_zone:
+                # Polar zones
+                green_cover = random.uniform(0, 12)
+                authenticity_score = random.uniform(0.88, 0.97)
+                reasons.append("Cryospheric Zone - Ice or Tundra Vegetation Mapping")
             else:
                 # Weighted towards "verified" (forests) only in non-harsh areas
                 green_cover = random.uniform(35, 98)

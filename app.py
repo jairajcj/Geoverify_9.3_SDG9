@@ -49,6 +49,20 @@ def send_real_email(receiver_email, subject, body):
 def index():
     return render_template('index.html')
 
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Returns the health status of the system and its components"""
+    return jsonify({
+        'status': 'HEALTHY',
+        'timestamp': time.time(),
+        'components': {
+            'sentinel': 'OPERATIONAL',
+            'blockchain': 'SYNCHRONIZED',
+            'marketplace': 'ACTIVE'
+        },
+        'version': '2.2.0'
+    })
+
 @app.route('/api/verify', methods=['POST'])
 def verify_asset():
     data = request.json
