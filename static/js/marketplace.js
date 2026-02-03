@@ -500,6 +500,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Clear form
                 e.target.reset();
 
+                // Auto-fill ID in other forms for smooth demo
+                const sellerIdInput = document.getElementById('sellerCompanyId');
+                const buyerIdInput = document.getElementById('buyerCompanyId');
+                if (sellerIdInput) sellerIdInput.value = data.company_id;
+                if (buyerIdInput) buyerIdInput.value = data.company_id;
+
                 // Update stats
                 setTimeout(() => loadMarketStats(), 1000);
             } else {

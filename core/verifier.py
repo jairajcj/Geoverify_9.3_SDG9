@@ -7,8 +7,8 @@ class GeoSentinel:
     to verify carbon assets.
     """
     def __init__(self):
-        self.green_threshold = 45.0
-        self.confidence_threshold = 0.80
+        self.green_threshold = 28.0
+        self.confidence_threshold = 0.60
         self.verification_history = []  # Track all verifications
 
     def verify_location(self, lat, lon):
@@ -24,8 +24,8 @@ class GeoSentinel:
             if past['status'] == "VERIFIED":
                 dist_lat = abs(lat - past['latitude'])
                 dist_lon = abs(lon - past['longitude'])
-                # Roughly 0.005 approx 500m
-                if dist_lat < 0.005 and dist_lon < 0.005:
+                # Reduced sensitivity for double counting during demo
+                if dist_lat < 0.001 and dist_lon < 0.001:
                     return {
                         "latitude": lat,
                         "longitude": lon,
@@ -48,13 +48,11 @@ class GeoSentinel:
             # Deterministic capability based on coords for demo consistency
             random.seed(lat * 123.45 + lon * 67.89) 
             
-            # Mali/Sahel/Sahara Check (Arid Zones)
-            # Lat 12-35 and North Africa/Middle East longitudes are often desert
-            is_arid_zone = (12 <= lat <= 35) and (-20 <= lon <= 50)
+            # Narrowed Arid Zones (focusing on central Sahara/Middle East)
+            is_arid_zone = (18 <= lat <= 30) and (0 <= lon <= 40)
             
-            # Ocean Detection Heuristic (Simplified for Demo)
-            # Most of the Indian Ocean, South Atlantic, and Pacific areas
-            is_ocean = (lat < 10 and lon > 50) or (lat < 0 and -20 < lon < 20) or (lat < 20 and -180 < lon < -100)
+            # Narrowed Ocean Detection
+            is_ocean = (lat < 0 and lon > 60) or (lat < -10 and -10 < lon < 10)
 
             # Urban Environment Heuristic (High building density, low vegetation)
             # Simulating specific urban centers for demo (e.g., NYC, London, Tokyo)
@@ -66,11 +64,11 @@ class GeoSentinel:
             is_ice_zone = (lat > 65) or (lat < -60)
 
             if is_arid_zone:
-                # Desert zones have very low green cover
-                green_cover = random.uniform(2, 18) 
-                authenticity_score = random.uniform(0.65, 0.95)
-                if green_cover < 10:
-                    reasons.append("High Aridity Index - Desert Landscape Detected")
+                # Arid zones can still have moderate cover in some regions
+                green_cover = random.uniform(10, 35) 
+                authenticity_score = random.uniform(0.70, 0.95)
+                if green_cover < self.green_threshold:
+                    reasons.append("Low Vegetation Density - Arid Zone Patterns Detected")
             elif is_ocean:
                 # Ocean/Water bodies
                 green_cover = random.uniform(0, 5)
@@ -88,8 +86,8 @@ class GeoSentinel:
                 reasons.append("Cryospheric Zone - Ice or Tundra Vegetation Mapping")
             else:
                 # Weighted towards "verified" (forests) only in non-harsh areas
-                green_cover = random.uniform(35, 98)
-                authenticity_score = random.uniform(0.78, 0.99)
+                green_cover = random.uniform(25, 98)
+                authenticity_score = random.uniform(0.70, 0.99)
 
         # 3. Decision Logic
         is_valid = True

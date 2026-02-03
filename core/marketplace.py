@@ -79,9 +79,10 @@ class CarbonMarketplace:
             'efficiency_score': 74.5 if energy_type == 'grid' else 92.1
         }
         
-    def register_company(self, company_name, industry, country, wallet_address, email=None):
+    def register_company(self, company_name, industry, country, wallet_address='DEMO_WALLET', email=None):
         """Register a manufacturing company on the platform"""
         company_id = hashlib.sha256(f"{company_name}{time.time()}".encode()).hexdigest()[:12]
+        print(f"DEBUG: Registered company {company_name} with ID: {company_id}")
         
         self.companies[company_id] = {
             'company_id': company_id,
